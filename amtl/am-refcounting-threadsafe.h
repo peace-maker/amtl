@@ -60,6 +60,11 @@ class RefcountedThreadsafe
     }
 
   protected:
+    bool refcountIsOne() const {
+      return refcount_.refcountIsOne();
+    }
+
+  protected:
     ~RefcountedThreadsafe() {
     }
 

@@ -182,6 +182,10 @@ class AtomicRefcount
     return Ops::Decrement(&value_) != 0;
   }
 
+  bool refcountIsOne() const {
+    return value_ == 1;
+  }
+
  private:
   Ops::Type value_;
 };
