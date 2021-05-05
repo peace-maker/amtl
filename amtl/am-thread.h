@@ -36,7 +36,10 @@
 
 #include <amtl/am-platform.h>
 
-#if defined(KE_POSIX)
+#if defined(KE_EMSCRIPTEN)
+# include <emscripten.h>
+# include <emscripten/threading.h>
+#elif defined(KE_POSIX)
 # include <pthread.h>
 #elif defined(KE_WINDOWS)
 # include <codecvt>
@@ -76,6 +79,8 @@ static void SetThreadName(HANDLE thread, const char* name) {
 static inline void SetThreadName(const char* name) {
 #if defined(KE_MACOSX)
     pthread_setname_np(name);
+#elif defined(KE_EMSCRIPTEN)
+    emscripten_set_thread_name(pthread_self(), name);
 #elif defined(KE_POSIX)
     pthread_setname_np(pthread_self(), name);
 #elif defined(KE_WINDOWS)
@@ -86,7 +91,9 @@ static inline void SetThreadName(const char* name) {
 }
 
 static inline void SetThreadName(std::thread* thread, const char* name) {
-#if defined(KE_POSIX) && !defined(KE_MACOSX)
+#if defined(KE_EMSCRIPTEN)
+    emscripten_set_thread_name(thread->native_handle(), name);
+#elif defined(KE_POSIX) && !defined(KE_MACOSX)
     pthread_setname_np(thread->native_handle(), name);
 #elif defined(KE_WINDOWS)
     impl::SetThreadName(thread->native_handle(), name);
